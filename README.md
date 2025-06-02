@@ -34,37 +34,12 @@ The Mobile Pool is a 14-day learning program where you build one project each da
 - **Day 13**: Optimize app performance
 - **Day 14**: Publish your app to app stores
 
-## Prerequisites
-
-**You need:**
-- Basic programming knowledge (any language)
-- A computer (Windows, Mac, or Linux)
-- 2-3 hours available each day
-
-**Not required:**
-- Mobile development experience
-- Flutter or Dart knowledge
-
-## What You Need
-
-1. A computer capable of running development software
-2. Internet connection
-3. Android phone OR iPhone for testing (emulators work too)
-4. 2-4 hours daily
-
 ## Why Flutter?
 
 - 📱 Write once, run on both Android and iPhone
 - 🚀 Fast development with instant reload
 - 🎨 Easy to create modern interfaces
 - 💼 Used by Google, BMW, and Alibaba
-
-## Getting Started
-
-1. Install Flutter from flutter.dev
-2. Get VS Code or Android Studio (both free)
-3. Set up your phone for testing
-4. Clone this repository and start with Day 1
 
 ## Expected Outcome
 

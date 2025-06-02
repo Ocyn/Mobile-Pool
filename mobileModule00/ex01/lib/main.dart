@@ -38,11 +38,7 @@ class MyHomePage extends StatelessWidget {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Center(
-            child: MegaCard(
-              key: Key('A simple Text'),
-            ),
-          ),
+          Center(child: MegaCard(key: Key('A simple Text'))),
           ElevatedButton(
             onPressed: () {
               print('Button pressed');
@@ -56,20 +52,14 @@ class MyHomePage extends StatelessWidget {
 }
 
 class MegaCard extends StatelessWidget {
-  const MegaCard({
-    super.key,
-  });
+  const MegaCard({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Text('A simple text'),
-          ],
-        ),
+        child: Column(children: [Text('A simple text')]),
       ),
     );
   }
