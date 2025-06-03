@@ -90,26 +90,24 @@ class MainContainer extends StatelessWidget {
 
   static const digitColor = Color.fromARGB(255, 47, 47, 62);
   static const operatorColor = Color.fromARGB(255, 255, 255, 255);
-  static const clearColor = Color.fromARGB(255, 255, 0, 0);
+  static const clearColor = Color.fromARGB(255, 207, 0, 0);
+  static const output = '0';
+  static const input = '0';
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      // mainAxisAlignment: MainAxisAlignment.center,
+      // mainAxisAlignment: MainAxisAlignment.end,
       children: <Widget>[
-        const TextField(
-          // Input field
-          readOnly: true,
-          textAlign: TextAlign.right,
-          style: TextStyle(fontSize: 32),
-          decoration: InputDecoration(hintText: '0'),
+        Container(
+          alignment: Alignment.centerRight,
+          padding: const EdgeInsets.only(right: 12),
+          child: const Text(input, style: TextStyle(fontSize: 32)),
         ),
-        const TextField(
-          // Output field
-          readOnly: true,
-          textAlign: TextAlign.right,
-          style: TextStyle(fontSize: 32),
-          decoration: InputDecoration(hintText: '0'),
+        Container(
+          alignment: Alignment.centerRight,
+          padding: const EdgeInsets.only(right: 12),
+          child: const Text(output, style: TextStyle(fontSize: 32)),
         ),
         Expanded(child: Container()),
         Container(
