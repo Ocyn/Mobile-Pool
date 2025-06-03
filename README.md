@@ -58,5 +58,3 @@ Through these modules, the following skills will be developed:
 
 ---
 
-*Ready to dive into mobile development? Let's build something amazing! 🌟*
-
