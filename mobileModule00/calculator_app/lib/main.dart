@@ -1,74 +1,242 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Namer App',
+      title: 'ex02',
       theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color.fromARGB(255, 49, 18, 83),
+        ),
       ),
-      home: MyHomePage(),
+      home: const MyHomePage(title: 'Calculator'),
+    );
+  }
+}
+
+class CalculatorButton extends StatelessWidget {
+  final String buttonTitle;
+  final Color? buttonColor;
+  final VoidCallback onPressed;
+
+  const CalculatorButton({
+    super.key,
+    required this.buttonTitle,
+    required this.onPressed,
+    this.buttonColor,
+  });
+
+  void onButtonPressed() {
+    print('Button $buttonTitle pressed');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: TextButton(
+        onPressed: onButtonPressed,
+        style: ElevatedButton.styleFrom(
+          textStyle: const TextStyle(fontSize: 20),
+        ),
+        child: Text(
+          buttonTitle,
+          style: TextStyle(
+            color: buttonColor ?? const Color.fromARGB(255, 255, 255, 255),
+          ),
+        ),
+      ),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key, required this.title});
+
+  final String title;
+
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  bool isToggled = true;
-
-  void toggle() {
-    setState(() {
-      isToggled = !isToggled;
-    });
-    print('Toggled: $isToggled');
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Center(
-            child: MegaCard(text: isToggled ? 'A simple text' : 'hello world'),
+      appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 107, 108, 138),
+
+        title: Center(
+          child: Text(
+            widget.title,
+            style: const TextStyle(fontSize: 32, color: Colors.white),
           ),
-          ElevatedButton(onPressed: toggle, child: Text('Click me')),
-        ],
+        ),
       ),
+      body: Center(child: MainContainer()),
     );
   }
 }
 
-class MegaCard extends StatelessWidget {
-  final String text;
+class MainContainer extends StatelessWidget {
+  const MainContainer({super.key});
 
-  const MegaCard({super.key, required this.text});
+  static const digitColor = Color.fromARGB(255, 47, 47, 62);
+  static const operatorColor = Color.fromARGB(255, 255, 255, 255);
+  static const clearColor = Color.fromARGB(255, 207, 0, 0);
+  static const output = '0';
+  static const input = '0';
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final style = theme.textTheme.displayMedium!.copyWith(
-      color: theme.colorScheme.onPrimary,
-    );
-
-    return Card(
-      color: theme.colorScheme.primary,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(children: [Text(text, style: style)]),
-      ),
+    return Column(
+      // mainAxisAlignment: MainAxisAlignment.end,
+      children: <Widget>[
+        Container(
+          alignment: Alignment.centerRight,
+          padding: const EdgeInsets.only(right: 12),
+          child: const Text(input, style: TextStyle(fontSize: 32)),
+        ),
+        Container(
+          alignment: Alignment.centerRight,
+          padding: const EdgeInsets.only(right: 12),
+          child: const Text(output, style: TextStyle(fontSize: 32)),
+        ),
+        Expanded(child: Container()),
+        Container(
+          padding: const EdgeInsets.all(4.0),
+          color: const Color.fromARGB(255, 107, 108, 138),
+          child: Column(
+            // Buttons
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CalculatorButton(
+                    buttonTitle: '7',
+                    onPressed: () {},
+                    buttonColor: digitColor,
+                  ),
+                  CalculatorButton(
+                    buttonTitle: '8',
+                    onPressed: () {},
+                    buttonColor: digitColor,
+                  ),
+                  CalculatorButton(
+                    buttonTitle: '9',
+                    onPressed: () {},
+                    buttonColor: digitColor,
+                  ),
+                  CalculatorButton(
+                    buttonTitle: 'C',
+                    onPressed: () {},
+                    buttonColor: clearColor,
+                  ),
+                  CalculatorButton(
+                    buttonTitle: 'AC',
+                    onPressed: () {},
+                    buttonColor: clearColor,
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CalculatorButton(
+                    buttonTitle: '4',
+                    onPressed: () {},
+                    buttonColor: digitColor,
+                  ),
+                  CalculatorButton(
+                    buttonTitle: '5',
+                    onPressed: () {},
+                    buttonColor: digitColor,
+                  ),
+                  CalculatorButton(
+                    buttonTitle: '6',
+                    onPressed: () {},
+                    buttonColor: digitColor,
+                  ),
+                  CalculatorButton(
+                    buttonTitle: '+',
+                    onPressed: () {},
+                    buttonColor: operatorColor,
+                  ),
+                  CalculatorButton(
+                    buttonTitle: '-',
+                    onPressed: () {},
+                    buttonColor: operatorColor,
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CalculatorButton(
+                    buttonTitle: '1',
+                    onPressed: () {},
+                    buttonColor: digitColor,
+                  ),
+                  CalculatorButton(
+                    buttonTitle: '2',
+                    onPressed: () {},
+                    buttonColor: digitColor,
+                  ),
+                  CalculatorButton(
+                    buttonTitle: '3',
+                    onPressed: () {},
+                    buttonColor: digitColor,
+                  ),
+                  CalculatorButton(
+                    buttonTitle: 'x',
+                    onPressed: () {},
+                    buttonColor: operatorColor,
+                  ),
+                  CalculatorButton(
+                    buttonTitle: '/',
+                    onPressed: () {},
+                    buttonColor: operatorColor,
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CalculatorButton(
+                    buttonTitle: '0',
+                    onPressed: () {},
+                    buttonColor: digitColor,
+                  ),
+                  CalculatorButton(
+                    buttonTitle: '.',
+                    onPressed: () {},
+                    buttonColor: digitColor,
+                  ),
+                  CalculatorButton(
+                    buttonTitle: '00',
+                    onPressed: () {},
+                    buttonColor: digitColor,
+                  ),
+                  CalculatorButton(
+                    buttonTitle: '=',
+                    onPressed: () {},
+                    buttonColor: operatorColor,
+                  ),
+                  CalculatorButton(buttonTitle: ' ', onPressed: () {}),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
