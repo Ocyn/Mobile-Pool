@@ -1,53 +1,62 @@
-# Mobile-Pool
 
-A 2-week Flutter development program for creating Android and iOS applications.
+# 📱 Mobile Pool
 
-## What is This?
+## 🎯 Overview
 
-The Mobile Pool is a 14-day learning program where you build one project each day. By the end, you'll know how to create mobile apps that work on both Android and iPhone using Flutter.
+This project involves completing a comprehensive mobile development piscine consisting of **6 progressive modules**. Each module builds upon the previous one, creating a structured learning path through mobile application development.
 
-## How It Works
+---
 
-**The Daily Structure:**
-- 📅 One exercise per day for 14 consecutive days
-- 🎯 Each day builds on the previous one
-- 📱 End goal: Create functional mobile apps
-- ⏰ Time commitment: 2-4 hours per day
+## 📚 Modules to Complete
 
-## What You'll Learn
+The following modules must be completed in **sequential order**:
 
-### Week 1: Getting Started 🏗️
-- **Day 1**: Learn Dart programming language
-- **Day 2**: Install Flutter and create your first app
-- **Day 3**: Build app screens and layouts
-- **Day 4**: Make your app interactive
-- **Day 5**: Navigate between different screens
-- **Day 6**: Handle user input (text fields, buttons)
-- **Day 7**: Display lists of information
+| Module | Title | Focus Area |
+|--------|-------|------------|
+| 📱 **Mobile - 0** | Basic-of-the-mobile-application | Fundamentals |
+| 🏗️ **Mobile - 1** | Structure and logic | Architecture |
+| 🌐 **Mobile - 2** | API and data | Integration |
+| 🎨 **Mobile - 3** | Design | UI/UX |
+| 🔐 **Mobile - 4** | Auth and dataBase | Security |
+| 📊 **Mobile - 5** | Manage data and display | Advanced Data |
 
-### Week 2: Real App Features 🚀
-- **Day 8**: Connect to the internet for data
-- **Day 9**: Save information on the phone
-- **Day 10**: Add animations and custom designs
-- **Day 11**: Use phone features (camera, GPS)
-- **Day 12**: Test your app and fix bugs
-- **Day 13**: Optimize app performance
-- **Day 14**: Publish your app to app stores
+---
 
-## Why Flutter?
+## 🚀 Skills to be Acquired
 
-- 📱 Write once, run on both Android and iPhone
-- 🚀 Fast development with instant reload
-- 🎨 Easy to create modern interfaces
-- 💼 Used by Google, BMW, and Alibaba
+Through these modules, the following skills will be developed:
 
-## Expected Outcome
+### Core Competencies
+- 📱 **Mobile Application Fundamentals**: Understanding core concepts of mobile app development
+- 🏗️ **Application Architecture**: Learning proper structure and logical organization of mobile applications
+- 🌐 **API Integration**: Working with external APIs and handling data communication
 
-After completing this pool:
-- Build professional mobile apps
-- Understand mobile app architecture
-- Connect apps to internet services
-- Store data locally
-- Navigate the development process
-- Have 6+ working mobile applications in your portfolio
+### Advanced Skills
+- 🎨 **UI/UX Design**: Implementing effective user interface and experience design principles
+- 🔐 **Authentication Systems**: Implementing user authentication and database integration
+- 📊 **Data Management**: Advanced data handling, storage, and display techniques
+
+---
+
+## ✅ Requirements
+
+> **Important**: Each module must be validated before proceeding to the next
+
+### Timeline & Commitment
+- ⏰ **Minimum**: Two weeks of dedicated work
+- 📅 **Frequency**: Regular daily submissions recommended
+
+### Evaluation Process
+- 👥 **Peer Reviews**: Must be completed within **2 days** for each module
+- 🤝 **Collaboration**: Working with other students is **highly encouraged**
+
+### Success Criteria
+- [ ] Complete all 6 modules sequentially
+- [ ] Pass peer evaluations for each module
+- [ ] Maintain consistent daily progress
+- [ ] Engage actively with the learning community
+
+---
+
+*Ready to dive into mobile development? Let's build something amazing! 🌟*
 
