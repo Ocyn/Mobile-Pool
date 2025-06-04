@@ -81,13 +81,10 @@ class _MyHomePageState extends State<MyHomePage> {
         _handleOperator(buttonText);
       } else if (buttonText == '=') {
         _calculateResult();
-        //   } else if (buttonText == '+/-') {
-        //     _toggleSign();
       } else {
         _handleNumber(buttonText);
       }
       print("last Char: $lastChar");
-      if (!(['C', 'AC'].contains(buttonText))) lastChar = buttonText;
     });
   }
 
@@ -114,6 +111,7 @@ class _MyHomePageState extends State<MyHomePage> {
         _inputText = number;
       } else {
         _inputText = _inputText + number;
+        lastChar = number;
       }
     });
   }
@@ -124,14 +122,18 @@ class _MyHomePageState extends State<MyHomePage> {
         (_inputText[0] == '0') &&
         ['-'].contains(operator)) {
       _inputText = operator;
+      lastChar = operator;
     } else if (['+', '×', '/'].contains(lastChar)) {
       if (operator != lastChar) {
         _inputText = _inputText.substring(0, _inputText.length - 1);
         _inputText = _inputText + operator;
+        lastChar = operator;
       }
     } else if (!(['-'].contains(lastChar) &&
-        ['+', '×', '/'].contains(operator)))
+        ['+', '×', '/'].contains(operator))) {
       _inputText = _inputText + operator;
+      lastChar = operator;
+    }
   }
 
   void _calculateResult() {
