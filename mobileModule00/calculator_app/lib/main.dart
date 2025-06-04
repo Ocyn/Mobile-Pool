@@ -68,7 +68,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String _outputText = '0';
   String _inputText = '0';
-  String lastChar = '';
+  String lastChar = '0';
   ExpressionParser mathParser = GrammarParser();
 
   void _onButtonPressed(String buttonText) {
@@ -108,7 +108,10 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       if (_inputText.length == 1 &&
           (_inputText[0] == '0' || _inputText[0] == '00')) {
-        _inputText = number;
+        if (number == '.')
+          _inputText = _inputText + number;
+        else
+          _inputText = number;
       } else {
         _inputText = _inputText + number;
         lastChar = number;
@@ -137,19 +140,54 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _calculateResult() {
-    print("calculate: [$_inputText]");
     if ((['+', '-', '.', '×', '/'].contains(lastChar))) {
       _outputText = 'invalid expression';
+    } else if (_hasMultipleDecimals()) {
+      _outputText = 'invalid expression';
+    } else if (_hasConsecutiveOperators()) {
+      _outputText = 'invalid expression';
+    } else {
+      try {
+        String processedInput = _inputText.replaceAll('×', '*');
+        Expression expression = mathParser.parse(processedInput);
+        String result = expression
+            .evaluate(EvaluationType.REAL, ContextModel())
+            .toString();
+        setState(() {
+          _outputText = result;
+        });
+      } catch (e) {
+        setState(() {
+          _outputText = 'Error';
+        });
+      }
     }
-    if (!(['+', '-', '.', '×', '/'].contains(lastChar))) {
-      Expression expression = mathParser.parse(_inputText);
-      String result = expression
-          .evaluate(EvaluationType.REAL, ContextModel())
-          .toString();
-      setState(() {
-        _outputText = result;
-      });
+  }
+
+  bool _hasMultipleDecimals() {
+    List<String> operands = _inputText.split(RegExp(r'[+\-×/]'));
+    for (String operand in operands) {
+      int decimalCount = 0;
+      for (int i = 0; i < operand.length; i++) {
+        if (operand[i] == '.') {
+          decimalCount++;
+        }
+      }
+      if (decimalCount > 1) {
+        return true;
+      }
     }
+    return false;
+  }
+
+  bool _hasConsecutiveOperators() {
+    for (int i = 0; i < _inputText.length - 1; i++) {
+      if (['+', '×', '/'].contains(_inputText[i]) &&
+          ['+', '×', '/'].contains(_inputText[i + 1])) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @override
