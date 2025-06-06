@@ -1,0 +1,116 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Weather App',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+      ),
+      home: DefaultTabController(
+        length: 3,
+        child: MyHomePage(title: 'Weather Report'),
+      ),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key, required this.title});
+
+  final String title;
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  void onPressedLocationButton() {
+    print("Location button pressed WTF");
+  }
+
+  Widget geoLocationButton() {
+    return FloatingActionButton(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      onPressed: () {
+        onPressedLocationButton();
+      },
+      child: Icon(Icons.location_on),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Row(children: [SpecialTextField(), geoLocationButton()]),
+      ),
+      body: Center(
+        child: TabBarView(
+          children: [
+            Icon(Icons.currency_bitcoin),
+            Icon(Icons.umbrella),
+            Icon(Icons.fire_truck),
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        padding: EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            TabButton(title: 'Currently', icon: Icon(Icons.calendar_today)),
+            TabButton(title: 'Today', icon: Icon(Icons.calendar_view_day)),
+            TabButton(title: 'Weekly', icon: Icon(Icons.calendar_month)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class TabButton extends StatelessWidget {
+  final String title;
+  final Icon icon;
+
+  const TabButton({super.key, required this.title, required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        IconButton(onPressed: () {}, icon: icon),
+        Text(title, style: TextStyle(fontSize: 12)),
+      ],
+    );
+  }
+}
+
+class SpecialTextField extends StatelessWidget {
+  const SpecialTextField({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: TextField(
+        decoration: InputDecoration(
+          hintText: 'Search...',
+          border: InputBorder.none,
+          hintStyle: TextStyle(color: Colors.white70),
+          prefixIcon: Icon(Icons.search),
+        ),
+        style: TextStyle(color: Colors.white),
+      ),
+    );
+  }
+}
