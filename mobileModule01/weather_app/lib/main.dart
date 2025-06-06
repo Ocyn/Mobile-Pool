@@ -33,8 +33,15 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  late TabController _tabController;
+
   void onPressedLocationButton() {
     print("Location button pressed WTF");
+  }
+
+  void initState() {
+    super.initState();
+    _tabController = DefaultTabController.of(context);
   }
 
   Widget geoLocationButton() {
@@ -65,13 +72,25 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       bottomNavigationBar: BottomAppBar(
-        padding: EdgeInsets.all(8.0),
+        padding: EdgeInsets.all(2.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            TabButton(title: 'Currently', icon: Icon(Icons.calendar_today)),
-            TabButton(title: 'Today', icon: Icon(Icons.calendar_view_day)),
-            TabButton(title: 'Weekly', icon: Icon(Icons.calendar_month)),
+            TabButton(
+              title: 'Currently',
+              icon: Icon(Icons.sunny),
+              onPressed: () => DefaultTabController.of(context).animateTo(0),
+            ),
+            TabButton(
+              title: 'Today',
+              icon: Icon(Icons.calendar_today),
+              onPressed: () => DefaultTabController.of(context).animateTo(1),
+            ),
+            TabButton(
+              title: 'Weekly',
+              icon: Icon(Icons.calendar_month),
+              onPressed: () => DefaultTabController.of(context).animateTo(2),
+            ),
           ],
         ),
       ),
@@ -82,16 +101,24 @@ class _MyHomePageState extends State<MyHomePage> {
 class TabButton extends StatelessWidget {
   final String title;
   final Icon icon;
+  final VoidCallback? onPressed;
 
-  const TabButton({super.key, required this.title, required this.icon});
+  const TabButton({
+    super.key,
+    required this.title,
+    required this.icon,
+    this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        IconButton(onPressed: () {}, icon: icon),
-        Text(title, style: TextStyle(fontSize: 12)),
-      ],
+    return Expanded(
+      child: Column(
+        children: [
+          IconButton(onPressed: onPressed, icon: icon),
+          Text(title, style: TextStyle(fontSize: 12)),
+        ],
+      ),
     );
   }
 }
