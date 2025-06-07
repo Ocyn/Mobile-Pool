@@ -34,14 +34,24 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late TabController _tabController;
+  String _searchCity = "";
 
   void onPressedLocationButton() {
     print("Location button pressed WTF");
+    setState(() {
+      _searchCity = "Geolocation";
+    });
   }
 
+  @override
+  void didChangeDepencencies() {
+    super.didChangeDependencies();
+    _tabController = DefaultTabController.of(context);
+  }
+
+  @override
   void initState() {
     super.initState();
-    _tabController = DefaultTabController.of(context);
   }
 
   Widget geoLocationButton() {
@@ -55,20 +65,78 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Widget _currentlyPage() {
+    return Expanded(
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Currently \n$_searchCity",
+              style: TextStyle(fontSize: 22),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _todayPage() {
+    return Expanded(
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Today \n$_searchCity",
+              style: TextStyle(fontSize: 22),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _weeklyPage() {
+    return Expanded(
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Weekly \n$_searchCity",
+              style: TextStyle(fontSize: 22),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Row(children: [SpecialTextField(), geoLocationButton()]),
+        title: Row(
+          children: [
+            SpecialTextField(
+              onSearchChanged: (value) {
+                setState(() {
+                  _searchCity = value;
+                });
+              },
+            ),
+            geoLocationButton(),
+          ],
+        ),
       ),
       body: Center(
         child: TabBarView(
-          children: [
-            Icon(Icons.currency_bitcoin),
-            Icon(Icons.umbrella),
-            Icon(Icons.fire_truck),
-          ],
+          children: [_currentlyPage(), _todayPage(), _weeklyPage()],
         ),
       ),
       bottomNavigationBar: BottomAppBar(
@@ -76,20 +144,16 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            TabButton(
-              title: 'Currently',
-              icon: Icon(Icons.sunny),
-              onPressed: () => DefaultTabController.of(context).animateTo(0),
-            ),
+            TabButton(title: 'Currently', icon: Icon(Icons.sunny), tabIndex: 0),
             TabButton(
               title: 'Today',
               icon: Icon(Icons.calendar_today),
-              onPressed: () => DefaultTabController.of(context).animateTo(1),
+              tabIndex: 1,
             ),
             TabButton(
               title: 'Weekly',
               icon: Icon(Icons.calendar_month),
-              onPressed: () => DefaultTabController.of(context).animateTo(2),
+              tabIndex: 2,
             ),
           ],
         ),
@@ -101,13 +165,13 @@ class _MyHomePageState extends State<MyHomePage> {
 class TabButton extends StatelessWidget {
   final String title;
   final Icon icon;
-  final VoidCallback? onPressed;
+  final int tabIndex;
 
   const TabButton({
     super.key,
     required this.title,
     required this.icon,
-    this.onPressed,
+    required this.tabIndex,
   });
 
   @override
@@ -115,7 +179,11 @@ class TabButton extends StatelessWidget {
     return Expanded(
       child: Column(
         children: [
-          IconButton(onPressed: onPressed, icon: icon),
+          IconButton(
+            onPressed: () =>
+                DefaultTabController.of(context).animateTo(tabIndex),
+            icon: icon,
+          ),
           Text(title, style: TextStyle(fontSize: 12)),
         ],
       ),
@@ -124,12 +192,15 @@ class TabButton extends StatelessWidget {
 }
 
 class SpecialTextField extends StatelessWidget {
-  const SpecialTextField({super.key});
+  final ValueChanged<String>? onSearchChanged;
+
+  const SpecialTextField({super.key, this.onSearchChanged});
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: TextField(
+        onChanged: onSearchChanged,
         decoration: InputDecoration(
           hintText: 'Search...',
           border: InputBorder.none,
