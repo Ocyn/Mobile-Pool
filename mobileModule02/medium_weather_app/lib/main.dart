@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:weather/weather.dart';
+import 'services/geocoding.dart';
+import 'services/location.dart';
 
 void main() {
   runApp(const MyApp());
@@ -34,6 +37,10 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late TabController _tabController;
+  WeatherFactory wf = new WeatherFactory(
+    "2709c218504646cc4c3251759b90dda6",
+    language: Language.FRENCH,
+  );
   String _searchCity = "";
 
   void onPressedLocationButton() {
