@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:weather/weather.dart';
+import 'services/weather.dart';
 import 'services/geocoding.dart';
 import 'services/location.dart';
 
@@ -37,17 +39,28 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late TabController _tabController;
-  WeatherFactory wf = new WeatherFactory(
-    "2709c218504646cc4c3251759b90dda6",
-    language: Language.FRENCH,
-  );
+
+  Map<String, double>? coordinates;
+  String _city = "";
+  String _country = "";
+  String _locationStatus = "awaiting...";
   String _searchCity = "";
 
-  void onPressedLocationButton() {
-    print("Location button pressed WTF");
+  Future<void> onPressedLocationButton() async {
+    print("Location button pressed Searching current device location...");
+    await _getlocation();
     setState(() {
-      _searchCity = "Geolocation";
+      print("location: $_locationStatus");
+      if (coordinates != null) {
+        // Utilisez les coordonnées pour obtenir le nom de la ville
+        _searchCity = "City: $_city\nCountry: $_country";
+      } else {
+        _searchCity = _locationStatus;
+      }
     });
+    if (coordinates != null) {
+      await _getWeather();
+    }
   }
 
   @override
@@ -61,11 +74,91 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
+  Future<void> _getlocation() async {
+    try {
+      final coords = await LocationService.getCurrentCoordinates();
+      setState(() {
+        if (coords != null) {
+          coordinates = coords;
+          _locationStatus =
+              "Location found: [${coords['latitude']}, ${coords['longitude']}}]";
+        } else {
+          _locationStatus = "Unable to get current location";
+        }
+      });
+
+      if (coords != null) {
+        try {
+          List<Placemark> placemarks =
+              await GeocodingService.getPlacemarkFromCoordinates(
+                coords['latitude']!,
+                coords['longitude']!,
+              );
+          setState(() {
+            if (placemarks.isNotEmpty) {
+              _city = placemarks.first.locality ?? "City not found";
+              _country = placemarks.first.country ?? "COuntry not found";
+              _locationStatus += "\nCity: $_city, $_country";
+            }
+          });
+        } catch (e) {
+          setState(() {
+            _locationStatus += "\nGeocoding error: $e";
+          });
+        }
+      }
+    } catch (e) {
+      setState(() {
+        _locationStatus = "Error: $e";
+      });
+    }
+  }
+
+  Future<Weather?> _getWeather() async {
+    WeatherFactory? weatherFactory = await WeatherService.initWeatherService(
+      "2709c218504646cc4c3251759b90dda6",
+    );
+
+    if (weatherFactory == null || coordinates == null) {
+      print("Error : WeatherFactory or coordinates null");
+      return null;
+    }
+
+    double? latitude = coordinates!['latitude'];
+    double? longitude = coordinates!['longitude'];
+
+    if (latitude == null || longitude == null) {
+      print("Error: Coordinates values null");
+      return null;
+    }
+
+    Weather? weather = await WeatherService.getWeatherByCoords(
+      latitude,
+      longitude,
+      weatherFactory,
+    );
+    if (weather != null) {
+      print("Weather Data:");
+      print("Temperature: ${weather.temperature?.celsius}°C");
+      print("Feels Like: ${weather.tempFeelsLike?.celsius}°C");
+      print("Humidity: ${weather.humidity}%");
+      print("Pressure: ${weather.pressure}hPa");
+      print("Wind Speed: ${weather.windSpeed}m/s");
+    } else {
+      print("Weather data is null");
+    }
+    return weather;
+  }
+
   Widget geoLocationButton() {
     return FloatingActionButton(
       backgroundColor: Colors.transparent,
       elevation: 0,
       onPressed: () {
+        setState(() {
+          _locationStatus = "awaiting...";
+          _searchCity = _locationStatus;
+        });
         onPressedLocationButton();
       },
       child: Icon(Icons.location_on),
@@ -117,6 +210,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  // ################# MAIN BUILD
   @override
   Widget build(BuildContext context) {
     return Scaffold(

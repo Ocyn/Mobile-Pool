@@ -28,18 +28,26 @@ class LocationService {
 
   /// Checks if location services are enabled
   static Future<bool> _checkLocationService() async {
+    print('Checking location service...');
     bool serviceEnabled = await _location.serviceEnabled();
+    print('Location service enabled: $serviceEnabled');
     if (!serviceEnabled) {
+      print('Requesting location service...');
       serviceEnabled = await _location.requestService();
+      print('Location service request result: $serviceEnabled');
     }
     return serviceEnabled;
   }
 
   /// Checks and requests location permissions
   static Future<bool> _checkLocationPermission() async {
+    print('Checking location permission...');
     PermissionStatus permissionGranted = await _location.hasPermission();
+    print('Current permission status: $permissionGranted');
     if (permissionGranted == PermissionStatus.denied) {
+      print('Requesting location permission...');
       permissionGranted = await _location.requestPermission();
+      print('Permission request result: $permissionGranted');
     }
     return permissionGranted == PermissionStatus.granted;
   }
