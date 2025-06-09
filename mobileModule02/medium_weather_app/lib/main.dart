@@ -46,13 +46,14 @@ class _MyHomePageState extends State<MyHomePage> {
   String _locationStatus = "awaiting...";
   String _searchCity = "";
 
+  String _errorMessage = "";
+
   Future<void> onPressedLocationButton() async {
     print("Location button pressed Searching current device location...");
     await _getlocation();
     setState(() {
       print("location: $_locationStatus");
       if (coordinates != null) {
-        // Utilisez les coordonnées pour obtenir le nom de la ville
         _searchCity = "City: $_city\nCountry: $_country";
       } else {
         _searchCity = _locationStatus;
@@ -84,6 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
               "Location found: [${coords['latitude']}, ${coords['longitude']}}]";
         } else {
           _locationStatus = "Unable to get current location";
+          _errorMessage = "Unable to get current location";
         }
       });
 
@@ -104,12 +106,14 @@ class _MyHomePageState extends State<MyHomePage> {
         } catch (e) {
           setState(() {
             _locationStatus += "\nGeocoding error: $e";
+            _errorMessage = "$e";
           });
         }
       }
     } catch (e) {
       setState(() {
         _locationStatus = "Error: $e";
+        _errorMessage = "$e";
       });
     }
   }
@@ -166,18 +170,33 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _currentlyPage() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            "Currently \n$_searchCity",
-            style: TextStyle(fontSize: 22),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
+    if (_errorMessage.isNotEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Error \n$_searchCity",
+              style: TextStyle(fontSize: 22, color: Colors.red),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    } else {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Currently \n$_searchCity",
+              style: TextStyle(fontSize: 22),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   Widget _todayPage() {
