@@ -37,6 +37,7 @@ dependencies:
   weather: ^3.2.1
   geocoding: ^4.0.0
   location: ^8.0.0
+  open_meteo: ^2.0.3
 
 dev_dependencies:
   flutter_test:
