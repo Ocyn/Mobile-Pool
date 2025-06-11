@@ -340,8 +340,12 @@ class _SpecialTextFieldState extends State<SpecialTextField> {
         name: input,
         count: 5,
       );
+
       setState(() {
-        suggestions = results;
+        suggestions =
+            LocationSuggestion.toLocationSuggestion(results)
+                as List<LocationSuggestion>;
+        print(suggestions);
         showSuggestions = results.isNotEmpty;
       });
     } catch (e) {

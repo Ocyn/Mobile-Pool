@@ -20,6 +20,23 @@ class LocationSuggestion {
   String toString() {
     return '$city, $region, $country';
   }
+
+  static Future<LocationSuggestion> toLocationSuggestion(
+    Map<String, dynamic> data,
+  ) async {
+    if (data.containsKey("results") &&
+        data["results"] is List &&
+        (data["results"] as List).isNotEmpty) {
+      data = data["results"][0];
+    }
+    return LocationSuggestion(
+      city: data['name'] ?? 'Unknown',
+      region: data['admin1'] ?? 'Unknown',
+      country: data['country'] ?? 'Unknown',
+      lat: (data['latitude'] ?? 0.0).toDouble(),
+      lon: (data['longitude'] ?? 0.0).toDouble(),
+    );
+  }
 }
 
 class GeocodingService {
