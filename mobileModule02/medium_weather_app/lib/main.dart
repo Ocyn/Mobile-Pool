@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:weather/weather.dart';
@@ -242,7 +244,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onSearchChanged: (value) {
                 setState(() {
                   _searchCity = value;
-                  GeocodingService.getSuggestions(value, 5);
+                  // _SpecialTextFieldState._getSuggestions(value);
                 });
               },
             ),
@@ -340,12 +342,16 @@ class _SpecialTextFieldState extends State<SpecialTextField> {
         name: input,
         count: 5,
       );
-
+      if (results.isEmpty) throw Exception('error results is empty chakal');
+      List<dynamic> places = results['results'];
+      for (List<dynamic> place in places) {
+        LocationSuggestion suggestion =
+            await LocationSuggestion.toLocationSuggestion(place);
+        suggestions.add(suggestion);
+      }
+      print(suggestions);
+      // suggestion = await LocationSuggestion.toLocationSuggestion(results);
       setState(() {
-        suggestions =
-            LocationSuggestion.toLocationSuggestion(results)
-                as List<LocationSuggestion>;
-        print(suggestions);
         showSuggestions = results.isNotEmpty;
       });
     } catch (e) {

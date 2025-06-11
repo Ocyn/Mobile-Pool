@@ -22,19 +22,21 @@ class LocationSuggestion {
   }
 
   static Future<LocationSuggestion> toLocationSuggestion(
-    Map<String, dynamic> data,
+     List<dynamic> data,
   ) async {
-    if (data.containsKey("results") &&
-        data["results"] is List &&
-        (data["results"] as List).isNotEmpty) {
-      data = data["results"][0];
-    }
+    // Assuming data is a single place array from the API response
+    final city = data[0] ?? 'Unknown';
+    final region = data[1] ?? 'Unknown';
+    final country = data[2] ?? 'Unknown';
+    final lat = (data[3] as num?)?.toDouble() ?? 0.0;
+    final lon = (data[4] as num?)?.toDouble() ?? 0.0;
+
     return LocationSuggestion(
-      city: data['name'] ?? 'Unknown',
-      region: data['admin1'] ?? 'Unknown',
-      country: data['country'] ?? 'Unknown',
-      lat: (data['latitude'] ?? 0.0).toDouble(),
-      lon: (data['longitude'] ?? 0.0).toDouble(),
+      city: city,
+      region: region,
+      country: country,
+      lat: lat,
+      lon: lon,
     );
   }
 }
@@ -100,12 +102,12 @@ class GeocodingService {
           continue;
         }
       }
-      print('Found ${suggestions.length} suggestions for "$input":');
-      for (LocationSuggestion suggestion in suggestions) {
-        print(
-          '  ${suggestion.toString()} (${suggestion.lat}, ${suggestion.lon})',
-        );
-      }
+      // print('Found ${suggestions.length} suggestions for "$input":');
+      // for (LocationSuggestion suggestion in suggestions) {
+      //   // print(
+      //   //   '  ${suggestion.toString()} (${suggestion.lat}, ${suggestion.lon})',
+      //   // );
+      // }
       return suggestions;
     } catch (e) {
       throw Exception('Failed to get suggestions: [$e]');
