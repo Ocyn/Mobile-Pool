@@ -349,8 +349,7 @@ class _SpecialTextFieldState extends State<SpecialTextField> {
             await LocationSuggestion.toLocationSuggestion(place);
         suggestions.add(suggestion);
       }
-      print(suggestions);
-      // suggestion = await LocationSuggestion.toLocationSuggestion(results);
+      print("AAAAAAAAAAAAAAAAAAAAAAa $suggestions");
       setState(() {
         showSuggestions = results.isNotEmpty;
       });
@@ -362,40 +361,10 @@ class _SpecialTextFieldState extends State<SpecialTextField> {
     }
   }
 
-  Widget suggestionUnit(LocationSuggestion suggestion) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.location_on, size: 16, color: Colors.grey),
-          SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  suggestion.city,
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  '${suggestion.region}, ${suggestion.country}',
-                  style: TextStyle(color: Colors.grey, fontSize: 12),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Column(
+      child: Stack(
         children: [
           TextField(
             controller: _controller,
@@ -411,46 +380,15 @@ class _SpecialTextFieldState extends State<SpecialTextField> {
             ),
             style: TextStyle(color: Colors.white),
           ),
-          if (showSuggestions)
-            Positioned(
-              top: 60,
-              left: 0,
-              right: 0,
-              child: Container(
-                constraints: BoxConstraints(maxHeight: 200),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black26,
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: suggestions.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () {
-                        _controller.text = suggestions[index].city;
-                        setState(() {
-                          showSuggestions = false;
-                        });
-                        widget.onSearchChanged?.call(suggestions[index].city);
-                        widget.onLocationSelected?.call({
-                          'latitude': suggestions[index].lat,
-                          'longitude': suggestions[index].lon,
-                        });
-                      },
-                      child: suggestionUnit(suggestions[index]),
-                    );
-                  },
-                ),
-              ),
-            ),
+          ListView.separated(
+            itemBuilder: (context, index) {
+              return ListTile(title: Text("Michel"));
+            },
+            separatorBuilder: (context, index) {
+              return Divider();
+            },
+            itemCount: 5,
+          ),
         ],
       ),
     );
