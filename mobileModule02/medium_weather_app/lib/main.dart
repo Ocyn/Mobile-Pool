@@ -52,6 +52,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool showSuggestions = false;
 
   String _errorMessage = "";
+  bool _isLoadingSuggestions = false;
 
   // Nouvelle méthode pour mettre à jour les suggestions
   void _updateSuggestions(List<LocationSuggestion> newSuggestions, bool show) {
@@ -132,31 +133,52 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _getSuggestions(String input) async {
-    suggestions.clear();
+    if (input.isEmpty) {
+      setState(() {
+        suggestions.clear();
+        showSuggestions = false;
+        _isLoadingSuggestions = false;
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoadingSuggestions = true;
+      suggestions.clear();
+    });
+
     try {
       Map<String, dynamic> results = (await GeocodingApi().requestJson(
         name: input,
         count: 5,
       ));
+
       if (results.isEmpty) throw Exception('error results is empty chakal');
+
+      List<LocationSuggestion> newSuggestions = [];
       if (results.containsKey("results")) {
         List<dynamic> places = results['results'];
-        print(places);
         for (var place in places) {
           Map<String, dynamic> p = place as Map<String, dynamic>;
           LocationSuggestion s = await LocationSuggestion.toLocationSuggestion(
             p,
           );
-          print(
-            "################### LOCATION SUGGESTION\n\n$s\n\n\n#########################",
-          );
-          suggestions.add(s);
+          newSuggestions.add(s);
         }
       }
+
+      setState(() {
+        suggestions = newSuggestions;
+        showSuggestions = newSuggestions.isNotEmpty;
+        _isLoadingSuggestions = false;
+      });
     } catch (e) {
-      throw Exception("getSuggestion error: $e");
+      setState(() {
+        _errorMessage = "getSuggestion error: $e";
+        _isLoadingSuggestions = false;
+        showSuggestions = false;
+      });
     }
-    print("\n\nnewSuggestion:\n\n$suggestions\n\n\n\n\n");
   }
 
   Future<Weather?> _getWeather() async {
@@ -211,12 +233,12 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _currentlyPage() {
-    // showSuggestions = suggestions.isNotEmpty;
-    if (showSuggestions == true) {
+    if (_isLoadingSuggestions) {
+      return Center(child: CircularProgressIndicator());
+    } else if (showSuggestions && suggestions.isNotEmpty) {
       return ListView.separated(
         itemBuilder: (context, index) {
           LocationSuggestion city = suggestions[index];
-          print(city.city);
           return ListTile(
             title: Text(city.city),
             onTap: () {
@@ -226,37 +248,24 @@ class _MyHomePageState extends State<MyHomePage> {
               });
             },
           );
-          // return ListTile(title: Text("Michel $index"));
         },
-        separatorBuilder: (context, index) {
-          return Divider();
-        },
+        separatorBuilder: (context, index) => Divider(),
         itemCount: suggestions.length,
       );
-    } else if (showSuggestions == false && _errorMessage.isNotEmpty) {
+    } else if (_errorMessage.isNotEmpty) {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "Error \n$_searchCity",
-              style: TextStyle(fontSize: 22, color: Colors.red),
-              textAlign: TextAlign.center,
-            ),
-          ],
+        child: Text(
+          "Error: $_errorMessage",
+          style: TextStyle(fontSize: 22, color: Colors.red),
+          textAlign: TextAlign.center,
         ),
       );
     } else {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "Currently \n$_searchCity\nShowsugg: $showSuggestions",
-              style: TextStyle(fontSize: 22),
-              textAlign: TextAlign.center,
-            ),
-          ],
+        child: Text(
+          "Currently \n$_searchCity",
+          style: TextStyle(fontSize: 22),
+          textAlign: TextAlign.center,
         ),
       );
     }
@@ -301,12 +310,11 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Row(
           children: [
             SpecialTextField(
-              onSearchChanged: (value) {
+              onSearchChanged: (value) async {
                 setState(() {
                   _searchCity = value;
-                  showSuggestions = value.isNotEmpty;
-                  _getSuggestions(_searchCity);
                 });
+                await _getSuggestions(value);
               },
             ),
             geoLocationButton(),
