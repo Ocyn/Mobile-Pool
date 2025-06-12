@@ -48,8 +48,18 @@ class _MyHomePageState extends State<MyHomePage> {
   String _country = "";
   String _locationStatus = "awaiting...";
   String _searchCity = "";
+  List<LocationSuggestion> suggestions = [];
+  bool showSuggestions = false;
 
   String _errorMessage = "";
+
+  // Nouvelle méthode pour mettre à jour les suggestions
+  void _updateSuggestions(List<LocationSuggestion> newSuggestions, bool show) {
+    setState(() {
+      suggestions = newSuggestions;
+      showSuggestions = show;
+    });
+  }
 
   Future<void> onPressedLocationButton() async {
     print("Location button pressed Searching current device location...");
@@ -186,6 +196,16 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       );
+    } else if (showSuggestions == true) {
+      return ListView.separated(
+        itemBuilder: (context, index) {
+          return ListTile(title: Text("Michel"));
+        },
+        separatorBuilder: (context, index) {
+          return Divider();
+        },
+        itemCount: 5,
+      );
     } else {
       return Center(
         child: Column(
@@ -244,9 +264,9 @@ class _MyHomePageState extends State<MyHomePage> {
               onSearchChanged: (value) {
                 setState(() {
                   _searchCity = value;
-                  // _SpecialTextFieldState._getSuggestions(value);
                 });
               },
+              onSuggestionsChanged: _updateSuggestions, // Nouveau callback
             ),
             geoLocationButton(),
           ],
@@ -312,11 +332,14 @@ class TabButton extends StatelessWidget {
 class SpecialTextField extends StatefulWidget {
   final ValueChanged<String>? onSearchChanged;
   final Function(Map<String, double>)? onLocationSelected;
+  final Function(List<LocationSuggestion>, bool)?
+  onSuggestionsChanged; // Nouveau
 
   const SpecialTextField({
     super.key,
     this.onSearchChanged,
     this.onLocationSelected,
+    this.onSuggestionsChanged, // Nouveau
   });
 
   @override
@@ -324,20 +347,16 @@ class SpecialTextField extends StatefulWidget {
 }
 
 class _SpecialTextFieldState extends State<SpecialTextField> {
-  List<LocationSuggestion> suggestions = [];
-  bool showSuggestions = false;
   final TextEditingController _controller = TextEditingController();
 
   void _getSuggestions(String input) async {
     if (input.isEmpty) {
-      setState(() {
-        suggestions = [];
-        showSuggestions = false;
-      });
+      widget.onSuggestionsChanged?.call([], false); // Utiliser le callback
       return;
     }
 
     try {
+      List<LocationSuggestion> newSuggestions = []; // Variable locale
       Map<String, dynamic> results = await GeocodingApi().requestJson(
         name: input,
         count: 5,
@@ -347,24 +366,22 @@ class _SpecialTextFieldState extends State<SpecialTextField> {
       for (List<dynamic> place in places) {
         LocationSuggestion suggestion =
             await LocationSuggestion.toLocationSuggestion(place);
-        suggestions.add(suggestion);
+        newSuggestions.add(suggestion);
       }
-      print("AAAAAAAAAAAAAAAAAAAAAAa $suggestions");
-      setState(() {
-        showSuggestions = results.isNotEmpty;
-      });
+      print("AAAAAAAAAAAAAAAAAAAAAAa $newSuggestions");
+      widget.onSuggestionsChanged?.call(
+        newSuggestions,
+        results.isNotEmpty,
+      ); // Utiliser le callback
     } catch (e) {
-      setState(() {
-        suggestions = [];
-        showSuggestions = false;
-      });
+      widget.onSuggestionsChanged?.call([], false); // Utiliser le callback
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Stack(
+      child: Column(
         children: [
           TextField(
             controller: _controller,
@@ -379,15 +396,6 @@ class _SpecialTextFieldState extends State<SpecialTextField> {
               prefixIcon: Icon(Icons.search),
             ),
             style: TextStyle(color: Colors.white),
-          ),
-          ListView.separated(
-            itemBuilder: (context, index) {
-              return ListTile(title: Text("Michel"));
-            },
-            separatorBuilder: (context, index) {
-              return Divider();
-            },
-            itemCount: 5,
           ),
         ],
       ),
