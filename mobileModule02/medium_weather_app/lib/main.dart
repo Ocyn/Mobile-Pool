@@ -240,7 +240,7 @@ class _MyHomePageState extends State<MyHomePage> {
           title: Text(city.city),
           subtitle: Text('${city.country}, ${city.region}'),
           onTap: () {
-            setState(() {
+            setState(() async {
               _searchCity = city.city;
               showSuggestions = false;
             });
@@ -266,6 +266,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       );
     } else {
+      // Weather? w = await _getWeather();
       return Center(
         child: Text(
           "Currently \n$_searchCity",
