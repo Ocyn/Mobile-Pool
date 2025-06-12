@@ -241,6 +241,7 @@ class _MyHomePageState extends State<MyHomePage> {
           LocationSuggestion city = suggestions[index];
           return ListTile(
             title: Text(city.city),
+            subtitle: Text('${city.country}, ${city.region}'),
             onTap: () {
               setState(() {
                 _searchCity = city.city;
@@ -272,33 +273,83 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _todayPage() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            "Today \n$_searchCity",
-            style: TextStyle(fontSize: 22),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
+    if (_isLoadingSuggestions) {
+      return Center(child: CircularProgressIndicator());
+    } else if (showSuggestions && suggestions.isNotEmpty) {
+      return ListView.separated(
+        itemBuilder: (context, index) {
+          LocationSuggestion city = suggestions[index];
+          return ListTile(
+            title: Text(city.city),
+            subtitle: Text('${city.country}, ${city.region}'),
+            onTap: () {
+              setState(() {
+                _searchCity = city.city;
+                showSuggestions = false;
+              });
+            },
+          );
+        },
+        separatorBuilder: (context, index) => Divider(),
+        itemCount: suggestions.length,
+      );
+    } else if (_errorMessage.isNotEmpty) {
+      return Center(
+        child: Text(
+          "Error: $_errorMessage",
+          style: TextStyle(fontSize: 22, color: Colors.red),
+          textAlign: TextAlign.center,
+        ),
+      );
+    } else {
+      return Center(
+        child: Text(
+          "Today \n$_searchCity",
+          style: TextStyle(fontSize: 22),
+          textAlign: TextAlign.center,
+        ),
+      );
+    }
   }
 
   Widget _weeklyPage() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            "Weekly \n$_searchCity",
-            style: TextStyle(fontSize: 22),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
+    if (_isLoadingSuggestions) {
+      return Center(child: CircularProgressIndicator());
+    } else if (showSuggestions && suggestions.isNotEmpty) {
+      return ListView.separated(
+        itemBuilder: (context, index) {
+          LocationSuggestion city = suggestions[index];
+          return ListTile(
+            title: Text(city.city),
+            subtitle: Text('${city.country}, ${city.region}'),
+            onTap: () {
+              setState(() {
+                _searchCity = city.city;
+                showSuggestions = false;
+              });
+            },
+          );
+        },
+        separatorBuilder: (context, index) => Divider(),
+        itemCount: suggestions.length,
+      );
+    } else if (_errorMessage.isNotEmpty) {
+      return Center(
+        child: Text(
+          "Error: $_errorMessage",
+          style: TextStyle(fontSize: 22, color: Colors.red),
+          textAlign: TextAlign.center,
+        ),
+      );
+    } else {
+      return Center(
+        child: Text(
+          "Weekly \n$_searchCity",
+          style: TextStyle(fontSize: 22),
+          textAlign: TextAlign.center,
+        ),
+      );
+    }
   }
 
   // ################# MAIN BUILD
