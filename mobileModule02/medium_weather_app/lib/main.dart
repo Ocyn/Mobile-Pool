@@ -57,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _updateSuggestions(List<LocationSuggestion> newSuggestions, bool show) {
     setState(() {
       suggestions = newSuggestions;
-      showSuggestions = show;
+      // showSuggestions = show;
     });
   }
 
@@ -131,6 +131,34 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  Future<void> _getSuggestions(String input) async {
+    suggestions.clear();
+    try {
+      Map<String, dynamic> results = (await GeocodingApi().requestJson(
+        name: input,
+        count: 5,
+      ));
+      if (results.isEmpty) throw Exception('error results is empty chakal');
+      if (results.containsKey("results")) {
+        List<dynamic> places = results['results'];
+        print(places);
+        for (var place in places) {
+          Map<String, dynamic> p = place as Map<String, dynamic>;
+          LocationSuggestion s = await LocationSuggestion.toLocationSuggestion(
+            p,
+          );
+          print(
+            "################### LOCATION SUGGESTION\n\n$s\n\n\n#########################",
+          );
+          suggestions.add(s);
+        }
+      }
+    } catch (e) {
+      throw Exception("getSuggestion error: $e");
+    }
+    print("\n\nnewSuggestion:\n\n$suggestions\n\n\n\n\n");
+  }
+
   Future<Weather?> _getWeather() async {
     WeatherFactory? weatherFactory = await WeatherService.initWeatherService(
       "2709c218504646cc4c3251759b90dda6",
@@ -183,7 +211,29 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _currentlyPage() {
-    if (_errorMessage.isNotEmpty) {
+    // showSuggestions = suggestions.isNotEmpty;
+    if (showSuggestions == true) {
+      return ListView.separated(
+        itemBuilder: (context, index) {
+          LocationSuggestion city = suggestions[index];
+          print(city.city);
+          return ListTile(
+            title: Text(city.city),
+            onTap: () {
+              setState(() {
+                _searchCity = city.city;
+                showSuggestions = false;
+              });
+            },
+          );
+          // return ListTile(title: Text("Michel $index"));
+        },
+        separatorBuilder: (context, index) {
+          return Divider();
+        },
+        itemCount: suggestions.length,
+      );
+    } else if (showSuggestions == false && _errorMessage.isNotEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -196,23 +246,13 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       );
-    } else if (showSuggestions == true) {
-      return ListView.separated(
-        itemBuilder: (context, index) {
-          return ListTile(title: Text("Michel"));
-        },
-        separatorBuilder: (context, index) {
-          return Divider();
-        },
-        itemCount: 5,
-      );
     } else {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "Currently \n$_searchCity",
+              "Currently \n$_searchCity\nShowsugg: $showSuggestions",
               style: TextStyle(fontSize: 22),
               textAlign: TextAlign.center,
             ),
@@ -264,9 +304,10 @@ class _MyHomePageState extends State<MyHomePage> {
               onSearchChanged: (value) {
                 setState(() {
                   _searchCity = value;
+                  showSuggestions = value.isNotEmpty;
+                  _getSuggestions(_searchCity);
                 });
               },
-              onSuggestionsChanged: _updateSuggestions, // Nouveau callback
             ),
             geoLocationButton(),
           ],
@@ -349,35 +390,6 @@ class SpecialTextField extends StatefulWidget {
 class _SpecialTextFieldState extends State<SpecialTextField> {
   final TextEditingController _controller = TextEditingController();
 
-  void _getSuggestions(String input) async {
-    if (input.isEmpty) {
-      widget.onSuggestionsChanged?.call([], false); // Utiliser le callback
-      return;
-    }
-
-    try {
-      List<LocationSuggestion> newSuggestions = []; // Variable locale
-      Map<String, dynamic> results = await GeocodingApi().requestJson(
-        name: input,
-        count: 5,
-      );
-      if (results.isEmpty) throw Exception('error results is empty chakal');
-      List<dynamic> places = results['results'];
-      for (List<dynamic> place in places) {
-        LocationSuggestion suggestion =
-            await LocationSuggestion.toLocationSuggestion(place);
-        newSuggestions.add(suggestion);
-      }
-      print("AAAAAAAAAAAAAAAAAAAAAAa $newSuggestions");
-      widget.onSuggestionsChanged?.call(
-        newSuggestions,
-        results.isNotEmpty,
-      ); // Utiliser le callback
-    } catch (e) {
-      widget.onSuggestionsChanged?.call([], false); // Utiliser le callback
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -387,7 +399,6 @@ class _SpecialTextFieldState extends State<SpecialTextField> {
             controller: _controller,
             onChanged: (value) {
               widget.onSearchChanged?.call(value);
-              _getSuggestions(value);
             },
             decoration: InputDecoration(
               hintText: 'Search...',

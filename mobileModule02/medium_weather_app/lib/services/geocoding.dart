@@ -22,14 +22,14 @@ class LocationSuggestion {
   }
 
   static Future<LocationSuggestion> toLocationSuggestion(
-     List<dynamic> data,
+    Map<String, dynamic> data,
   ) async {
-    // Assuming data is a single place array from the API response
-    final city = data[0] ?? 'Unknown';
-    final region = data[1] ?? 'Unknown';
-    final country = data[2] ?? 'Unknown';
-    final lat = (data[3] as num?)?.toDouble() ?? 0.0;
-    final lon = (data[4] as num?)?.toDouble() ?? 0.0;
+    // Assuming data is a single place object from the API response
+    final city = data['name'] ?? 'Unknown';
+    final region = data['admin1'] ?? 'Unknown';
+    final country = data['country_code'] ?? 'Unknown';
+    final lat = (data['latitude'] as num?)?.toDouble() ?? 0.0;
+    final lon = (data['longitude'] as num?)?.toDouble() ?? 0.0;
 
     return LocationSuggestion(
       city: city,
