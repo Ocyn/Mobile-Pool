@@ -232,27 +232,31 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Widget _buildSuggestionsListView() {
+    return ListView.separated(
+      itemBuilder: (context, index) {
+        LocationSuggestion city = suggestions[index];
+        return ListTile(
+          title: Text(city.city),
+          subtitle: Text('${city.country}, ${city.region}'),
+          onTap: () {
+            setState(() {
+              _searchCity = city.city;
+              showSuggestions = false;
+            });
+          },
+        );
+      },
+      separatorBuilder: (context, index) => Divider(),
+      itemCount: suggestions.length,
+    );
+  }
+
   Widget _currentlyPage() {
     if (_isLoadingSuggestions) {
       return Center(child: CircularProgressIndicator());
     } else if (showSuggestions && suggestions.isNotEmpty) {
-      return ListView.separated(
-        itemBuilder: (context, index) {
-          LocationSuggestion city = suggestions[index];
-          return ListTile(
-            title: Text(city.city),
-            subtitle: Text('${city.country}, ${city.region}'),
-            onTap: () {
-              setState(() {
-                _searchCity = city.city;
-                showSuggestions = false;
-              });
-            },
-          );
-        },
-        separatorBuilder: (context, index) => Divider(),
-        itemCount: suggestions.length,
-      );
+      return _buildSuggestionsListView();
     } else if (_errorMessage.isNotEmpty) {
       return Center(
         child: Text(
@@ -276,23 +280,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (_isLoadingSuggestions) {
       return Center(child: CircularProgressIndicator());
     } else if (showSuggestions && suggestions.isNotEmpty) {
-      return ListView.separated(
-        itemBuilder: (context, index) {
-          LocationSuggestion city = suggestions[index];
-          return ListTile(
-            title: Text(city.city),
-            subtitle: Text('${city.country}, ${city.region}'),
-            onTap: () {
-              setState(() {
-                _searchCity = city.city;
-                showSuggestions = false;
-              });
-            },
-          );
-        },
-        separatorBuilder: (context, index) => Divider(),
-        itemCount: suggestions.length,
-      );
+      return _buildSuggestionsListView();
     } else if (_errorMessage.isNotEmpty) {
       return Center(
         child: Text(
@@ -316,23 +304,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (_isLoadingSuggestions) {
       return Center(child: CircularProgressIndicator());
     } else if (showSuggestions && suggestions.isNotEmpty) {
-      return ListView.separated(
-        itemBuilder: (context, index) {
-          LocationSuggestion city = suggestions[index];
-          return ListTile(
-            title: Text(city.city),
-            subtitle: Text('${city.country}, ${city.region}'),
-            onTap: () {
-              setState(() {
-                _searchCity = city.city;
-                showSuggestions = false;
-              });
-            },
-          );
-        },
-        separatorBuilder: (context, index) => Divider(),
-        itemCount: suggestions.length,
-      );
+      return _buildSuggestionsListView();
     } else if (_errorMessage.isNotEmpty) {
       return Center(
         child: Text(
@@ -344,7 +316,7 @@ class _MyHomePageState extends State<MyHomePage> {
     } else {
       return Center(
         child: Text(
-          "Weekly \n$_searchCity",
+          "Weelky \n$_searchCity",
           style: TextStyle(fontSize: 22),
           textAlign: TextAlign.center,
         ),
@@ -432,14 +404,13 @@ class TabButton extends StatelessWidget {
 class SpecialTextField extends StatefulWidget {
   final ValueChanged<String>? onSearchChanged;
   final Function(Map<String, double>)? onLocationSelected;
-  final Function(List<LocationSuggestion>, bool)?
-  onSuggestionsChanged; // Nouveau
+  final Function(List<LocationSuggestion>, bool)? onSuggestionsChanged;
 
   const SpecialTextField({
     super.key,
     this.onSearchChanged,
     this.onLocationSelected,
-    this.onSuggestionsChanged, // Nouveau
+    this.onSuggestionsChanged,
   });
 
   @override
