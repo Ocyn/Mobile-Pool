@@ -43,7 +43,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   late TabController _tabController;
 
-  Map<String, double>? coordinates;
+  Map<String, double> coordinates = {'latitude': 0.0, 'longitude': 0.0};
   String _city = "";
   String _country = "";
   String _locationStatus = "awaiting...";
@@ -53,6 +53,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   String _errorMessage = "";
   bool _isLoadingSuggestions = false;
+
+  // Ajoutez cette variable dans votre classe State
+  Future<Map<String, dynamic>>? _weatherFuture;
 
   // Nouvelle méthode pour mettre à jour les suggestions
   void _updateSuggestions(List<LocationSuggestion> newSuggestions, bool show) {
@@ -74,7 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     });
     if (coordinates != null) {
-      await _getWeather();
+      await _getWeather(null);
     }
   }
 
@@ -181,13 +184,13 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<Weather?> _getWeather() async {
+  Future<Weather?> _getWeather(String? city) async {
     WeatherFactory? weatherFactory = await WeatherService.initWeatherService(
       "2709c218504646cc4c3251759b90dda6",
     );
 
     if (weatherFactory == null || coordinates == null) {
-      print("Error : WeatherFactory or coordinates null");
+      debugPrint("Error : WeatherFactory or coordinates null");
       return null;
     }
 
@@ -195,24 +198,28 @@ class _MyHomePageState extends State<MyHomePage> {
     double? longitude = coordinates!['longitude'];
 
     if (latitude == null || longitude == null) {
-      print("Error: Coordinates values null");
+      debugPrint("Error: Coordinates values null");
       return null;
     }
-
-    Weather? weather = await WeatherService.getWeatherByCoords(
-      latitude,
-      longitude,
-      weatherFactory,
-    );
-    if (weather != null) {
-      print("Weather Data:");
-      print("Temperature: ${weather.temperature?.celsius}°C");
-      print("Feels Like: ${weather.tempFeelsLike?.celsius}°C");
-      print("Humidity: ${weather.humidity}%");
-      print("Pressure: ${weather.pressure}hPa");
-      print("Wind Speed: ${weather.windSpeed}m/s");
+    late Weather? weather;
+    if (city!.isNotEmpty) {
+      weather = await WeatherService.getWeatherByCity(city, weatherFactory);
     } else {
-      print("Weather data is null");
+      weather = await WeatherService.getWeatherByCoords(
+        latitude,
+        longitude,
+        weatherFactory,
+      );
+    }
+    if (weather != null) {
+      debugPrint("Weather Data:");
+      debugPrint("Temperature: ${weather.temperature?.celsius}°C");
+      debugPrint("Feels Like: ${weather.tempFeelsLike?.celsius}°C");
+      debugPrint("Humidity: ${weather.humidity}%");
+      debugPrint("Pressure: ${weather.pressure}hPa");
+      debugPrint("Wind Speed: ${weather.windSpeed}m/s");
+    } else {
+      debugPrint("Weather data is null");
     }
     return weather;
   }
@@ -239,10 +246,18 @@ class _MyHomePageState extends State<MyHomePage> {
         return ListTile(
           title: Text(city.city),
           subtitle: Text('${city.country}, ${city.region}'),
-          onTap: () {
-            setState(() async {
+          onTap: () async {
+            setState(() {
               _searchCity = city.city;
+              coordinates['latitude'] = city.lat;
+              coordinates['longitude'] = city.lon;
               showSuggestions = false;
+              // Déclencher le chargement de la météo après la sélection
+              // _weatherFuture = _getWeather(city.city);
+              _weatherFuture = WeatherService.getWeather2(
+                coordinates['latitude']!,
+                coordinates['longitude']!,
+              );
             });
           },
         );
@@ -253,28 +268,68 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _currentlyPage() {
-    if (_isLoadingSuggestions) {
-      return Center(child: CircularProgressIndicator());
-    } else if (showSuggestions && suggestions.isNotEmpty) {
-      return _buildSuggestionsListView();
-    } else if (_errorMessage.isNotEmpty) {
-      return Center(
-        child: Text(
-          "Error: $_errorMessage",
-          style: TextStyle(fontSize: 22, color: Colors.red),
-          textAlign: TextAlign.center,
-        ),
-      );
-    } else {
-      // Weather? w = await _getWeather();
-      return Center(
-        child: Text(
-          "Currently \n$_searchCity",
-          style: TextStyle(fontSize: 22),
-          textAlign: TextAlign.center,
-        ),
-      );
-    }
+    return FutureBuilder<Map<String, dynamic>?>(
+      future: _weatherFuture,
+      builder: (context, snapshot) {
+        if (_isLoadingSuggestions) {
+          return Center(child: CircularProgressIndicator());
+        } else if (showSuggestions && suggestions.isNotEmpty) {
+          return _buildSuggestionsListView();
+        } else if (_errorMessage.isNotEmpty) {
+          return Center(
+            child: Text(
+              "Error: $_errorMessage",
+              style: TextStyle(fontSize: 22, color: Colors.red),
+              textAlign: TextAlign.center,
+            ),
+          );
+        } else if (snapshot.connectionState == ConnectionState.waiting &&
+            _weatherFuture != null) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasData && snapshot.data != null) {
+          Map<String, dynamic> weather = snapshot.data!;
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Currently",
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 10),
+                Text(_searchCity, style: TextStyle(fontSize: 20)),
+                SizedBox(height: 20),
+                if (weather['temperature'] != null)
+                  Text(
+                    "${weather['temperature']}°C",
+                    style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+                  ),
+                SizedBox(height: 10),
+                if (weather['windSpeed'] != null)
+                  Text(
+                    "Wind: ${weather['windSpeed']} km/h",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                SizedBox(height: 5),
+                if (weather['weatherCode'] != null)
+                  Text(
+                    "Weather Code: ${weather['weatherCode']}",
+                    style: TextStyle(fontSize: 18),
+                  ),
+              ],
+            ),
+          );
+        } else {
+          return Center(
+            child: Text(
+              "Currently \n$_searchCity\nNo weather data available",
+              style: TextStyle(fontSize: 22),
+              textAlign: TextAlign.center,
+            ),
+          );
+        }
+      },
+    );
   }
 
   Widget _todayPage() {
