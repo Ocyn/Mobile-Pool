@@ -75,7 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     });
     if (coordinates.isNotEmpty) {
-      _weatherFuture = WeatherService.getWeather2(
+      _weatherFuture = WeatherService.getWeatherHourly(
         coordinates['latitude']!,
         coordinates['longitude']!,
       );
@@ -253,9 +253,8 @@ class _MyHomePageState extends State<MyHomePage> {
               coordinates['latitude'] = city.lat;
               coordinates['longitude'] = city.lon;
               showSuggestions = false;
-              // Déclencher le chargement de la météo après la sélection
               // _weatherFuture = _getWeather(city.city);
-              _weatherFuture = WeatherService.getWeather2(
+              _weatherFuture = WeatherService.getWeatherHourly(
                 coordinates['latitude']!,
                 coordinates['longitude']!,
               );

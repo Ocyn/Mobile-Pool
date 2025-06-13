@@ -72,7 +72,7 @@ class WeatherService {
     }
   }
 
-  static Future<Map<String, List<dynamic>>> getWeather2(
+  static Future<Map<String, List<dynamic>>> getWeatherHourly(
     double lat,
     double lon,
   ) async {
@@ -124,6 +124,151 @@ class WeatherService {
       'temperatures': temperatures,
       'wind_speeds': windSpeeds,
       'weather_codes': weatherCodes,
+    };
+  }
+
+  static Future<Map<String, dynamic>> getCurrentWeather(
+    double lat,
+    double lon,
+  ) async {
+    final results = await WeatherApi().requestJson(
+      latitude: lat,
+      longitude: lon,
+      current: {
+        WeatherCurrent.temperature_2m,
+        WeatherCurrent.weather_code,
+        WeatherCurrent.wind_speed_10m,
+      },
+    );
+
+    if (results.isEmpty) {
+      throw Exception("getCurrentWeather error");
+    }
+
+    Map<String, dynamic> currentData = results['current'] ?? {};
+
+    return {
+      'time': currentData['time'] ?? '',
+      'temperature': currentData['temperature_2m']?.toDouble() ?? 0.0,
+      'weather_code':
+          weatherCodeStrings[currentData['weather_code']?.toDouble()] ??
+          'Unknown',
+      'wind_speed': currentData['wind_speed_10m']?.toDouble() ?? 0.0,
+    };
+  }
+
+  static Future<Map<String, List<dynamic>>> getTodayWeather(
+    double lat,
+    double lon,
+  ) async {
+    final results = await WeatherApi().requestJson(
+      latitude: lat,
+      longitude: lon,
+      hourly: {
+        WeatherHourly.temperature_2m,
+        WeatherHourly.weather_code,
+        WeatherHourly.wind_speed_10m,
+      },
+    );
+
+    if (results.isEmpty) {
+      throw Exception("getTodayWeather error");
+    }
+
+    Map<String, dynamic> hourlyData = results['hourly'] ?? {};
+
+    List<String> times =
+        (hourlyData['time'] as List?)
+            ?.map((time) => time.toString())
+            .toList() ??
+        [];
+
+    List<double> temperatures =
+        (hourlyData['temperature_2m'] as List?)
+            ?.map((temp) => temp?.toDouble() ?? 0.0)
+            .cast<double>()
+            .toList() ??
+        <double>[];
+
+    List<String> weatherCodes =
+        (hourlyData['weather_code'] as List?)
+            ?.map((code) => weatherCodeStrings[code?.toDouble()] ?? 'Unknown')
+            .toList() ??
+        <String>[];
+
+    List<double> windSpeeds =
+        (hourlyData['wind_speed_10m'] as List?)
+            ?.map((speed) => speed?.toDouble() ?? 0.0)
+            .cast<double>()
+            .toList() ??
+        <double>[];
+
+    return {
+      'times': times,
+      'temperatures': temperatures,
+      'weather_codes': weatherCodes,
+      'wind_speeds': windSpeeds,
+    };
+  }
+
+  static Future<Map<String, List<dynamic>>> getWeeklyWeather(
+    double lat,
+    double lon,
+  ) async {
+    final results = await WeatherApi().requestJson(
+      latitude: lat,
+      longitude: lon,
+      daily: {
+        WeatherDaily.weather_code,
+        WeatherDaily.temperature_2m_max,
+        WeatherDaily.temperature_2m_min,
+        WeatherDaily.wind_speed_10m_max,
+      },
+    );
+
+    if (results.isEmpty) {
+      throw Exception("getWeeklyWeather error");
+    }
+
+    Map<String, dynamic> dailyData = results['daily'] ?? {};
+
+    List<String> times =
+        (dailyData['time'] as List?)?.map((time) => time.toString()).toList() ??
+        [];
+
+    List<String> weatherCodes =
+        (dailyData['weather_code'] as List?)
+            ?.map((code) => weatherCodeStrings[code?.toDouble()] ?? 'Unknown')
+            .toList() ??
+        <String>[];
+
+    List<double> temperatureMax =
+        (dailyData['temperature_2m_max'] as List?)
+            ?.map((temp) => temp?.toDouble() ?? 0.0)
+            .cast<double>()
+            .toList() ??
+        <double>[];
+
+    List<double> temperatureMin =
+        (dailyData['temperature_2m_min'] as List?)
+            ?.map((temp) => temp?.toDouble() ?? 0.0)
+            .cast<double>()
+            .toList() ??
+        <double>[];
+
+    List<double> windSpeedMax =
+        (dailyData['wind_speed_10m_max'] as List?)
+            ?.map((speed) => speed?.toDouble() ?? 0.0)
+            .cast<double>()
+            .toList() ??
+        <double>[];
+
+    return {
+      'times': times,
+      'weather_codes': weatherCodes,
+      'temperature_max': temperatureMax,
+      'temperature_min': temperatureMin,
+      'wind_speed_max': windSpeedMax,
     };
   }
 }
