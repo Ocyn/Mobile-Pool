@@ -54,10 +54,8 @@ class _MyHomePageState extends State<MyHomePage> {
   String _errorMessage = "";
   bool _isLoadingSuggestions = false;
 
-  // Ajoutez cette variable dans votre classe State
-  Future<Map<String, dynamic>>? _weatherFuture;
+  Future<Map<String, List<dynamic>>>? _weatherFuture;
 
-  // Nouvelle méthode pour mettre à jour les suggestions
   void _updateSuggestions(List<LocationSuggestion> newSuggestions, bool show) {
     setState(() {
       suggestions = newSuggestions;
@@ -70,14 +68,17 @@ class _MyHomePageState extends State<MyHomePage> {
     await _getlocation();
     setState(() {
       print("location: $_locationStatus");
-      if (coordinates != null) {
+      if (coordinates.isNotEmpty) {
         _searchCity = "City: $_city\nCountry: $_country";
       } else {
         _searchCity = _locationStatus;
       }
     });
-    if (coordinates != null) {
-      await _getWeather(null);
+    if (coordinates.isNotEmpty) {
+      await WeatherService.getWeather2(
+        coordinates['latitude']!,
+        coordinates['longitude']!,
+      );
     }
   }
 
@@ -184,45 +185,45 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<Weather?> _getWeather(String? city) async {
-    WeatherFactory? weatherFactory = await WeatherService.initWeatherService(
-      "2709c218504646cc4c3251759b90dda6",
-    );
+  // Future<Weather?> _getWeather(String? city) async {
+  //   WeatherFactory? weatherFactory = await WeatherService.initWeatherService(
+  //     "2709c218504646cc4c3251759b90dda6",
+  //   );
 
-    if (weatherFactory == null || coordinates == null) {
-      debugPrint("Error : WeatherFactory or coordinates null");
-      return null;
-    }
+  //   if (weatherFactory == null || coordinates == null) {
+  //     debugPrint("Error : WeatherFactory or coordinates null");
+  //     return null;
+  //   }
 
-    double? latitude = coordinates!['latitude'];
-    double? longitude = coordinates!['longitude'];
+  //   double? latitude = coordinates!['latitude'];
+  //   double? longitude = coordinates!['longitude'];
 
-    if (latitude == null || longitude == null) {
-      debugPrint("Error: Coordinates values null");
-      return null;
-    }
-    late Weather? weather;
-    if (city!.isNotEmpty) {
-      weather = await WeatherService.getWeatherByCity(city, weatherFactory);
-    } else {
-      weather = await WeatherService.getWeatherByCoords(
-        latitude,
-        longitude,
-        weatherFactory,
-      );
-    }
-    if (weather != null) {
-      debugPrint("Weather Data:");
-      debugPrint("Temperature: ${weather.temperature?.celsius}°C");
-      debugPrint("Feels Like: ${weather.tempFeelsLike?.celsius}°C");
-      debugPrint("Humidity: ${weather.humidity}%");
-      debugPrint("Pressure: ${weather.pressure}hPa");
-      debugPrint("Wind Speed: ${weather.windSpeed}m/s");
-    } else {
-      debugPrint("Weather data is null");
-    }
-    return weather;
-  }
+  //   if (latitude == null || longitude == null) {
+  //     debugPrint("Error: Coordinates values null");
+  //     return null;
+  //   }
+  //   late Weather? weather;
+  //   if (city!.isNotEmpty) {
+  //     weather = await WeatherService.getWeatherByCity(city, weatherFactory);
+  //   } else {
+  //     weather = await WeatherService.getWeatherByCoords(
+  //       latitude,
+  //       longitude,
+  //       weatherFactory,
+  //     );
+  //   }
+  //   if (weather != null) {
+  //     debugPrint("Weather Data:");
+  //     debugPrint("Temperature: ${weather.temperature?.celsius}°C");
+  //     debugPrint("Feels Like: ${weather.tempFeelsLike?.celsius}°C");
+  //     debugPrint("Humidity: ${weather.humidity}%");
+  //     debugPrint("Pressure: ${weather.pressure}hPa");
+  //     debugPrint("Wind Speed: ${weather.windSpeed}m/s");
+  //   } else {
+  //     debugPrint("Weather data is null");
+  //   }
+  //   return weather;
+  // }
 
   Widget geoLocationButton() {
     return FloatingActionButton(
@@ -268,7 +269,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _currentlyPage() {
-    return FutureBuilder<Map<String, dynamic>?>(
+    return FutureBuilder<Map<String, List<dynamic>>?>(
       future: _weatherFuture,
       builder: (context, snapshot) {
         if (_isLoadingSuggestions) {
@@ -287,7 +288,7 @@ class _MyHomePageState extends State<MyHomePage> {
             _weatherFuture != null) {
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasData && snapshot.data != null) {
-          Map<String, dynamic> weather = snapshot.data!;
+          Map<String, List<dynamic>> weather = snapshot.data!;
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -299,21 +300,24 @@ class _MyHomePageState extends State<MyHomePage> {
                 SizedBox(height: 10),
                 Text(_searchCity, style: TextStyle(fontSize: 20)),
                 SizedBox(height: 20),
-                if (weather['temperature'] != null)
+                if (weather['temperatures'] != null &&
+                    weather['temperatures']!.isNotEmpty)
                   Text(
-                    "${weather['temperature']}°C",
+                    "${weather['temperatures']![0]}°C",
                     style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
                   ),
                 SizedBox(height: 10),
-                if (weather['windSpeed'] != null)
+                if (weather['wind_speeds'] != null &&
+                    weather['wind_speeds']!.isNotEmpty)
                   Text(
-                    "Wind: ${weather['windSpeed']} km/h",
+                    "Wind: ${weather['wind_speeds']![0]} km/h",
                     style: TextStyle(fontSize: 18),
                   ),
                 SizedBox(height: 5),
-                if (weather['weatherCode'] != null)
+                if (weather['weather_codes'] != null &&
+                    weather['weather_codes']!.isNotEmpty)
                   Text(
-                    "Weather Code: ${weather['weatherCode']}",
+                    "Weather Code: ${weather['weather_codes']![0]}",
                     style: TextStyle(fontSize: 18),
                   ),
               ],

@@ -43,7 +43,6 @@ class WeatherService {
       WeatherFactory wf = WeatherFactory(_APIKEY, language: Language.FRENCH);
       return wf;
     } catch (e) {
-      // Log error appropriately
       return null;
     }
   }
@@ -57,7 +56,6 @@ class WeatherService {
       Weather w = await wf.currentWeatherByLocation(lat, lon);
       return w;
     } catch (e) {
-      // Log error appropriately
       return null;
     }
   }
@@ -70,12 +68,11 @@ class WeatherService {
       Weather w = await wf.currentWeatherByCityName(cityName);
       return w;
     } catch (e) {
-      // Log error appropriately
       return null;
     }
   }
 
-  static Future<Map<String, dynamic>> getWeather2(
+  static Future<Map<String, List<dynamic>>> getWeather2(
     double lat,
     double lon,
   ) async {
@@ -91,10 +88,8 @@ class WeatherService {
     if (results.isEmpty) {
       throw Exception("getWeather2 error");
     }
-    // Extraction des données hourly uniquement
     Map<String, dynamic> hourlyData = results['hourly'] ?? {};
 
-    // Conversion sécurisée des times (peuvent être int ou String)
     List<String> times =
         (hourlyData['time'] as List?)
             ?.map((time) => time.toString())
@@ -124,6 +119,12 @@ class WeatherService {
     print('Temperatures: ${temperatures.take(3)}...');
     print('Wind speeds: ${windSpeeds.take(3)}...');
     print('Weather codes: ${weatherCodes.take(3)}...');
-    return hourlyData;
+
+    return {
+      'times': times,
+      'temperatures': temperatures,
+      'wind_speeds': windSpeeds,
+      'weather_codes': weatherCodes,
+    };
   }
 }
