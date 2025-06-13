@@ -75,7 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     });
     if (coordinates.isNotEmpty) {
-      await WeatherService.getWeather2(
+      _weatherFuture = WeatherService.getWeather2(
         coordinates['latitude']!,
         coordinates['longitude']!,
       );
@@ -317,7 +317,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 if (weather['weather_codes'] != null &&
                     weather['weather_codes']!.isNotEmpty)
                   Text(
-                    "Weather Code: ${weather['weather_codes']![0]}",
+                    "Weather State: ${weather['weather_codes']![0]}",
                     style: TextStyle(fontSize: 18),
                   ),
               ],

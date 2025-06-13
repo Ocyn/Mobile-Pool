@@ -108,12 +108,11 @@ class WeatherService {
             .cast<double>()
             .toList() ??
         <double>[];
-    List<int> weatherCodes =
+    List<String> weatherCodes =
         (hourlyData['weather_code'] as List?)
-            ?.map((code) => code?.toInt() ?? 0)
-            .cast<int>()
+            ?.map((code) => weatherCodeStrings[code?.toDouble()] ?? 'Unknown')
             .toList() ??
-        <int>[];
+        <String>[];
 
     print('Times: ${times.take(3)}...');
     print('Temperatures: ${temperatures.take(3)}...');
